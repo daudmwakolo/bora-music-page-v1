@@ -5,14 +5,48 @@
 :root {
   --gold: #D4AF37;
   --crimson: #DC143C;
+  /* NEW CONTRAST PALETTE FOR A06/SPARK 8 */
+  --silver-birch: #BDBDBD;    /* High-clarity secondary text */
+  --elevation-1: #121212;     /* Subtle lift for boxes */
+  --elevation-2: #1A1A1A;     /* Stronger lift for hovering/active */
+  --glass-border: #333333;    /* Gunmetal grey to define edges */
 }
 
 body {
   background: #080808;
   color: white;
+  -webkit-font-smoothing: antialiased; /* Sharper text for budget LCDs */
 }
 
-/* The Legacy Shimmer for the #1 Spot */
+/* --- THE UNIVERSE LIFT --- */
+.universe-card {
+  background: var(--elevation-1);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* Secondary words (Artist names, Stats) - Replacing the muddy grey */
+.text-secondary {
+  color: var(--silver-birch);
+  font-weight: 400;
+}
+
+/* --- THE OFFICIAL STANDINGS (Tables) --- */
+.table-header {
+  color: var(--gold);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Very faint line for hierarchy */
+}
+
+/* --- BORA CORE: HAPTIC ANIMATIONS --- */
 .shimmer-gold {
   background: linear-gradient(135deg, #b8860b 0%, #D4AF37 50%, #b8860b 100%);
   background-size: 200% auto;
@@ -22,63 +56,23 @@ body {
 @keyframes shimmer {
   0% { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
-  /* --- BORA CORE: HAPTIC ANIMATIONS --- */
+}
 
 @keyframes ignite-gold {
-  0% { 
-    color: #D4AF37; 
-    text-shadow: 0 0 0px rgba(212, 175, 55, 0); 
-    transform: scale(1); 
-  }
-  30% { 
-    color: #ffffff; 
-    text-shadow: 0 0 25px rgba(212, 175, 55, 0.8); 
-    transform: scale(1.6) rotate(-5deg); /* Slight rotation for "kick" */
-  }
-  100% { 
-    color: #D4AF37; 
-    text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); 
-    transform: scale(1) rotate(0deg); 
-  }
+  0% { color: var(--gold); text-shadow: 0 0 0px rgba(212, 175, 55, 0); transform: scale(1); }
+  30% { color: #ffffff; text-shadow: 0 0 25px rgba(212, 175, 55, 0.8); transform: scale(1.6) rotate(-5deg); }
+  100% { color: var(--gold); text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); transform: scale(1) rotate(0deg); }
 }
 
 @keyframes ignite-red {
-  0% { 
-    color: #DC143C; 
-    text-shadow: 0 0 0px rgba(220, 20, 60, 0); 
-    transform: scale(1); 
-  }
-  30% { 
-    color: #ffffff; 
-    text-shadow: 0 0 25px rgba(220, 20, 60, 0.8); 
-    transform: scale(1.6) rotate(5deg); 
-  }
-  100% { 
-    color: #DC143C; 
-    text-shadow: 0 0 8px rgba(220, 20, 60, 0.4); 
-    transform: scale(1) rotate(0deg); 
-  }
+  0% { color: var(--crimson); text-shadow: 0 0 0px rgba(220, 20, 60, 0); transform: scale(1); }
+  30% { color: #ffffff; text-shadow: 0 0 25px rgba(220, 20, 60, 0.8); transform: scale(1.6) rotate(5deg); }
+  100% { color: var(--crimson); text-shadow: 0 0 8px rgba(220, 20, 60, 0.4); transform: scale(1) rotate(0deg); }
 }
 
-/* Utilities for the JS Injection */
-.animate-ignite-gold {
-  animation: ignite-gold 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
+.animate-ignite-gold { animation: ignite-gold 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.animate-ignite-red { animation: ignite-red 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
 
-.animate-ignite-red {
-  animation: ignite-red 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-
-/* Subtle background pulse for the card when voting */
-@keyframes card-pulse {
-  0% { border-color: rgba(255,255,255,0.05); }
-  50% { border-color: rgba(212, 175, 55, 0.3); }
-  100% { border-color: rgba(255,255,255,0.05); }
-}
-
-.animate-card-pulse {
-  animation: card-pulse 0.6s ease-out;
-}
 @keyframes toast-slide-in {
   0% { transform: translate(-50%, 100%); opacity: 0; filter: blur(10px); }
   20% { transform: translate(-50%, -20px); opacity: 1; filter: blur(0px); }
@@ -86,7 +80,4 @@ body {
   100% { transform: translate(-50%, 20px); opacity: 0; }
 }
 
-.animate-toast {
-  animation: toast-slide-in 3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-}
+.animate-toast { animation: toast-slide-in 3s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
