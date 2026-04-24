@@ -1,5 +1,6 @@
 'use client';
-import { useState, useCallback, useRef } from 'react';
+
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 import Marquee from './components/Marquee';
 import Header from './components/Header';
@@ -12,24 +13,17 @@ import Footer from './components/Footer';
 import VoteToast from './components/VoteToast';
 
 export default function Home() {
-  const [toast, setToast] = useState<{
-    msg: string;
-    type: 'up' | 'down';
-    visible: boolean;
-  }>({
+  const [toast, setToast] = useState({
     msg: '',
-    type: 'up',
+    type: 'up' as 'up' | 'down',
     visible: false
   });
 
-  // Prevent stacking multiple timeouts
-  const toastTimer = useRef<NodeJS.Timeout | null>(null);
+  // FIX: browser-safe timeout type
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const triggerToast = useCallback((songName: string, type: 'up' | 'down') => {
-    // Clear previous timeout
-    if (toastTimer.current) {
-      clearTimeout(toastTimer.current);
-    }
+    if (toastTimer.current) clearTimeout(toastTimer.current);
 
     setToast({
       msg: type === 'up' ? `Pulse Added: ${songName}` : `Strike Cast: ${songName}`,
@@ -39,8 +33,31 @@ export default function Home() {
 
     toastTimer.current = setTimeout(() => {
       setToast(prev => ({ ...prev, visible: false }));
-    }, 3000);
+    }, 2500);
   }, []);
+
+  // FIX: cleanup to prevent StackBlitz/Vercel memory glitches
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
+
+  const standings = Array.from({ length: 17 }, (_, i) => {
+    const num = i + 4;
+    const isTop10 = num <= 10;
+
+    return {
+      num,
+      song: isTop10 ? "Sielewi" : "Archive Sequence",
+      artist: isTop10 ? "Zeke.bxt" : "Underground",
+      votes: isTop10 ? "4.5K" : "800",
+      weeks: num + 1,
+      yt: `#${num + 2}`,
+      sp: `#${num + 4}`,
+      bp: `#${num}`
+    };
+  });
 
   return (
     <main className="min-h-screen bg-[#050505] font-['Inter'] text-white antialiased">
@@ -48,7 +65,6 @@ export default function Home() {
       <Marquee />
       <Header />
 
-      {/* 1. THRONE */}
       <Throne
         song="Bongo Anthem"
         artist="Davieh G ft. Matitu"
@@ -63,83 +79,31 @@ export default function Home() {
 
       <div className="max-w-4xl mx-auto px-4">
 
-        {/* 2. PODIUM */}
         <Podium onVote={triggerToast} />
-
-        {/* 3. HOT */}
         <HotThree />
 
-        {/* 4. FULL STANDINGS */}
         <section className="mb-20">
           <RankingsDivider />
 
           <div className="flex flex-col gap-1">
-            {[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((num) => {
-              const isTop10 = num <= 10;
-              const songName = isTop10 ? "Sielewi" : "Archive Sequence";
-
-              return (
-                <RankRow
-                  key={num}
-                  rank={num}
-                  song={songName}
-                  artist={isTop10 ? "Zeke.bxt" : "Underground"}
-                  votes={isTop10 ? "4.5K" : "800"}
-                  weeks={num + 1}
-                  yt={`#${num + 2}`}
-                  sp={`#${num + 4}`}
-                  bp={`#${num}`}
-                  onVote={(type) => triggerToast(songName, type)}
-                />
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 5. NEW RELEASES (REFINED — LESS DOMINANT) */}
-        <section className="my-16 py-8 border-y border-white/5">
-          
-          <div className="mb-8 px-2">
-            <span className="text-[#DC143C] text-[8px] tracking-[0.6em] uppercase opacity-60">
-              Last 5 Days
-            </span>
-            <h3 className="text-white text-xl font-black uppercase tracking-tight">
-              New Releases
-            </h3>
-          </div>
-
-          <div className="overflow-hidden">
-            <div className="flex gap-6 px-4 overflow-x-auto">
-
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className="min-w-[160px] bg-[#0c0c0c] p-4 rounded-lg border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-300"
-                >
-                  <div className="aspect-square bg-[#050505] rounded-md mb-3 border border-white/5"></div>
-
-                  <h4 className="text-white text-[11px] font-bold uppercase truncate">
-                    Drop {item}
-                  </h4>
-
-                  <p className="text-white/30 text-[9px] uppercase mt-1">
-                    Artist Name
-                  </p>
-
-                  <div className="mt-3 text-[9px] text-white/40 flex flex-col gap-1">
-                    <span>▶ YouTube</span>
-                    <span>♫ Spotify</span>
-                    <span>▶ Boomplay</span>
-                  </div>
-                </div>
-              ))}
-
-            </div>
+            {standings.map((item) => (
+              <RankRow
+                key={item.num}
+                rank={item.num}
+                song={item.song}
+                artist={item.artist}
+                votes={item.votes}
+                weeks={item.weeks}
+                yt={item.yt}
+                sp={item.sp}
+                bp={item.bp}
+                onVote={(type) => triggerToast(item.song, type)}
+              />
+            ))}
           </div>
         </section>
 
         <NewsSection />
-
       </div>
 
       <Footer />
